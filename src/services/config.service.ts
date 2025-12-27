@@ -5,7 +5,7 @@ import { AppConfig } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ConfigService {
-  private readonly configUrl = 'assets/config.json';
+  private readonly configUrl = 'config.json';
   private cache$?: Observable<AppConfig>;
 
   constructor(private readonly http: HttpClient) {}

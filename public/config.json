@@ -5,12 +5,12 @@
     "endDate": "2026-03-15",
     "totalDays": 84,
     "daysLeft": 84,
-    "progress": 0,
+    "progress": 30,
     "milestones": [
       { "name": "Start", "date": "21.12.25" },
       { "name": "Platform FF", "date": "22.02.26" },
-      { "name": "Feature Freeze", "date": "01.03.26" },
-      { "name": "Code Freeze (end)", "date": "15.03.26" }
+      { "name": "Legacy FF", "date": "01.03.26" },
+      { "name": "End (CF)", "date": "15.03.26" }
     ],
     "branches": [
       {
@@ -74,10 +74,10 @@
   ],
   "birthdays": [
     {
-      "name": "Noa Levy",
-      "date": "March 24th",
+      "name": "Eli Cohen",
+      "date": "July 2nd",
       "daysAway": 2,
-      "image": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop"
+      "image": "https://avatars.slack-edge.com/2024-04-11/6943308671013_bcdb887b6c45c89c3a7e_192.jpg"
     },
     {
       "name": "Itay Cohen",
