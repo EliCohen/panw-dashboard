@@ -1,9 +1,9 @@
 <div class="app-shell">
-  <header class="card header">
+  <header class="card header hero">
     <div class="header-title">
       <div class="label">Current Version</div>
       <h1>{{ versionData.name }}</h1>
-      <div class="branches" *ngIf="versionData.branches?.length">
+      <div class="branches branch-grid" *ngIf="versionData.branches.length">
         <div *ngFor="let branch of versionData.branches" class="branch-row">
           <div class="branch-title">
             {{ branch.title }}
@@ -25,9 +25,9 @@
       </div>
     </div>
 
-    <div class="milestones" *ngIf="versionData.milestones?.length">
+    <div class="milestones" *ngIf="versionData.milestones.length">
       <div class="milestone-title">Key Dates</div>
-      <div class="milestone-list">
+      <div class="milestone-list pill-grid">
         <div class="milestone" *ngFor="let milestone of versionData.milestones">
           <div class="milestone-name">{{ milestone.name }}</div>
           <div class="milestone-date">{{ milestone.date }}</div>
@@ -49,6 +49,7 @@
       <section class="card roadmap">
         <h2 class="section-title"><span [innerHTML]="calendarIcon"></span> Version Roadmap</h2>
         <div class="timeline">
+          <div class="timeline-rail" aria-hidden="true"></div>
           <div *ngFor="let drop of drops" class="timeline-item" [ngClass]="drop.status">
             <div class="dot" [ngClass]="drop.status">
               <span *ngIf="drop.status === 'completed'">{{ checkIcon }}</span>
@@ -67,9 +68,13 @@
       <section class="card carousel">
         <div class="divider" aria-hidden="true"></div>
         <article *ngFor="let team of teams; let i = index" class="slide" [ngClass]="{ 'active': i === activeSlide }">
-          <div class="icon-circle" [style.borderColor]="team.borderColor" [innerHTML]="usersIcon"></div>
-          <div class="team-pill"><span [innerHTML]="usersMiniIcon"></span> {{ team.name }}</div>
-          <h2>Current Initiatives</h2>
+          <div class="slide-header">
+            <div class="icon-circle" [style.borderColor]="team.borderColor" [innerHTML]="usersIcon"></div>
+            <div class="team-meta">
+              <div class="team-pill"><span [innerHTML]="usersMiniIcon"></span> {{ team.name }}</div>
+              <h2>Current Initiatives</h2>
+            </div>
+          </div>
 
           <ul class="feature-list">
             <li *ngFor="let feature of team.features" class="feature-item">
@@ -87,8 +92,8 @@
 
     <aside class="rightbar">
       <section class="card birthday-card">
-        <div class="avatar">
-          <img [src]="birthdays[0].image" [alt]="birthdays[0].name" />
+        <div class="avatar halo">
+          <img [src]="birthdays[0].image" [alt]="birthdays[0].name" referrerpolicy="no-referrer" />
           <div class="cake-icon" [innerHTML]="cakeIcon"></div>
         </div>
         <h3>Upcoming Birthday</h3>
