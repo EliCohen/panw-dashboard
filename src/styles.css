@@ -1,3 +1,41 @@
 /* You can add global styles to this file, and also import other style files */
-
 @import "tailwindcss";
+
+:root {
+  --bg-900: #0c0e14;
+  --bg-800: #0f1118;
+  --bg-700: #171925;
+  --card-border: rgba(255, 255, 255, 0.06);
+  --muted: #a1a1aa;
+  --blue: #60a5fa;
+  --indigo: #6366f1;
+  --green: #22c55e;
+  --pink: #ec4899;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: radial-gradient(80% 60% at 15% 20%, rgba(37, 99, 235, 0.08), transparent),
+    radial-gradient(70% 50% at 80% 0%, rgba(236, 72, 153, 0.08), transparent),
+    #090b10;
+  color: #e5e7eb;
+  min-height: 100vh;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.35);
+  color: #fff;
+}

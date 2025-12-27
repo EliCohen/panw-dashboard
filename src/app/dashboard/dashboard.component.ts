@@ -1,4 +1,4 @@
-import { AsyncPipe, CommonModule, NgClass } from '@angular/common';
+import { CommonModule, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 // import { BreakpointObserver, Breakpoints, LayoutModule } from '@angular/cdk/layout';
 // import { ScrollingModule } from '@angular/cdk/scrolling';
@@ -10,7 +10,7 @@ import { ConfigService } from '../../services/config.service';
 @Component({
   selector: 'dashboard',
   standalone: true,
-  imports: [CommonModule, NgClass, AsyncPipe],
+  imports: [CommonModule, NgClass],
 //   imports: [CommonModule, NgClass, LayoutModule, ScrollingModule, AsyncPipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
