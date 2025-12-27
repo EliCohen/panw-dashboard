@@ -1,59 +1,19 @@
-# PanwDashboard
+# PANW Dashboard (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+An Angular 20 SPA that renders the PANW Group release dashboard with CDK layout helpers and static configuration-driven content.
 
-## Development server
+## Prerequisites
+- Node.js 18+
+- npm access to fetch packages (install dependencies with `npm install`).
 
-To start a local development server, run:
+## Scripts
+- `npm install` – install dependencies.
+- `npm start` – run the dev server at `http://localhost:4200/`.
+- `npm run build` – production build to `dist/panw-grop-dashboard`.
+- `npm test` – run unit tests (Karma/Jasmine).
 
-```bash
-ng serve
-```
+## Configuration
+Data lives in `src/assets/config.json`. Adjust version metadata, roadmap drops, team initiatives, and birthdays there; the app reloads this file on startup.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Notes
+- This repo was manually scaffolded to mirror Angular CLI defaults because direct registry access may be restricted in some environments. If your network blocks npm/CDN access, configure your npm proxy or offline registry before installing dependencies.
