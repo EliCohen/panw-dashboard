@@ -16,7 +16,7 @@ import { ConfigService } from '../../services/config.service';
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
   versionData: VersionData = {
     name: 'Loading…',
     startDate: new Date(),
