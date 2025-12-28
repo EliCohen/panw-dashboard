@@ -217,9 +217,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return { month: Number(isoMatch[2]) - 1, day: Number(isoMatch[3]) };
     }
 
-    const monthDayMatch = trimmed.match(/^(\d{2})-(\d{2})$/);
+    const monthDayMatch = trimmed.match(/^(\d{2})[-/](\d{2})$/);
     if (monthDayMatch) {
-      return { month: Number(monthDayMatch[1]) - 1, day: Number(monthDayMatch[2]) };
+      return { month: Number(monthDayMatch[2]) - 1, day: Number(monthDayMatch[1]) };
     }
 
     const cleaned = trimmed.replace(/(\d+)(st|nd|rd|th)/gi, '$1');
@@ -238,7 +238,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private formatBirthdayDate(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(date).toUpperCase();
   }
 
   private startOfDay(date: Date): Date {
