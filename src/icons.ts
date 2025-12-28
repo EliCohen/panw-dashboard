@@ -7,7 +7,7 @@ export const calendarIcon = `
   </svg>`;
 
 export const clockIcon = `
-  <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6ef2bf" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10"></circle>
     <polyline points="12 6 12 12 16 14"></polyline>
   </svg>`;
