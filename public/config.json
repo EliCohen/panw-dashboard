@@ -74,16 +74,104 @@
   ],
   "birthdays": [
     {
+      "name": "Yakov Morar",
+      "date": "25/09",
+      "image": "https://avatars.slack-edge.com/2025-04-27/8823556802465_5e66f4e01f7117392f40_192.png"
+    },
+    {
       "name": "Eli Cohen",
-      "date": "July 2nd",
-      "daysAway": 2,
+      "date": "02/07",
+      "image": "https://paloaltonetworks-be.glean.com/api/v1/images?key=eyJ0eXBlIjoiVUdDIiwiaWQiOiIwIiwiZHMiOiJHQUxMRVJZLUlNQUdFLUNST1BQRVIiLCJjaWQiOiJmYjM3YjM1Ny0yZDllLTQyNjgtOWFjNi04OTI2OTgzZDc4NDciLCJleHQiOiIuanBlZyJ9&crop=eyJjcm9wU3R5bGUiOiJzcXVhcmUiLCJoZWlnaHQiOjY1MCwib3JpZ2luYWxVcmwiOiJodHRwczovL3BhbG9hbHRvbmV0d29ya3MtYmUuZ2xlYW4uY29tL2FwaS92MS9pbWFnZXM/a2V5PWV5SjBlWEJsSWpvaVZVZERJaXdpYVdRaU9pSXdJaXdpWkhNaU9pSkhRVXhNUlZKWkxVbE5RVWRGTFZCSlEwdEZVaUlzSW1OcFpDSTZJbU00TmpVek56Z3pMVGczTmpFdE5EUXdOQzA0TjJFd0xXVTVaVEl4Tnpka09UTmtNaUlzSW1WNGRDSTZJaTVxY0dWbkluMD0iLCJ3aWR0aCI6NjUxLCJ4IjoyMDEsInkiOjB9"
+    },
+    {
+      "name": "Ron Kozitsa",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2024-07-27/7473127342487_79e80b7fc9706660a5c8_192.jpg"
+    },
+    {
+      "name": "Anna Vaisman-Omesi",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2021-02-22/1770600173206_82f6b8a7210e08108b65_192.jpg"
+    },
+    {
+      "name": "Dor Wucher",
+      "date": "17/11",
+      "image": "https://avatars.slack-edge.com/2018-01-11/297232005603_2d611572fe894d72ae19_192.jpg"
+    },
+    {
+      "name": "Alexander Faitelson",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2019-01-20/528124331460_02c5f085a77a903d7a40_192.jpg"
+    },
+    {
+      "name": "Tim Bitanov",
+      "date": "25/12",
+      "image": "https://avatars.slack-edge.com/2025-01-21/8321806152549_fc22c0e2f0f6fd879904_192.jpg"
+    },
+    {
+      "name": "Reut Kravchook",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2022-01-03/2902620300243_46d7f3b127aae2a93ff6_192.png"
+    },
+    {
+      "name": "Matan Shushan",
+      "date": "22/09",
       "image": "https://avatars.slack-edge.com/2024-04-11/6943308671013_bcdb887b6c45c89c3a7e_192.jpg"
     },
     {
-      "name": "Itay Cohen",
-      "date": "April 2nd",
-      "daysAway": 11,
-      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+      "name": "Uriel Goldstein",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2024-07-30/7510902166737_a73a6f766f988200e5b3_192.jpg"
+    },
+    {
+      "name": "Lion Levy",
+      "date": "10/01",
+      "image": "https://avatars.slack-edge.com/2024-04-14/6952863765830_6e1488072d406002dd4e_192.jpg"
+    },
+    {
+      "name": "Alex Savenok",
+      "date": "27/06",
+      "image": "https://avatars.slack-edge.com/2025-02-26/8517799784100_27ff44f75cba7b8bec7d_192.jpg"
+    },
+    {
+      "name": "Chaim Malov",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2025-12-07/10065137352963_d65f3f6257d4a9826f4f_192.png"
+    },
+    {
+      "name": "Moran Cohen",
+      "date": "23/08",
+      "image": "https://avatars.slack-edge.com/2024-09-24/7777367987411_b2728b3c77758880fb61_192.png"
+    },
+    {
+      "name": "Shimon Korkus",
+      "date": "06/09",
+      "image": "https://avatars.slack-edge.com/2022-08-03/3885796057925_a4e3b884b4844ce4abc6_192.jpg"
+    },
+    {
+      "name": "Doron Azulay",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2025-05-12/8877915959126_c69f9ab4c9b47aeaf5fc_192.jpg"
+    },
+    {
+      "name": "Asaf Bello",
+      "date": "",
+      "image": "https://secure.gravatar.com/avatar/ad755d882f2ee95fef83e86b2652dc29.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0024-192.png"
+    },
+    {
+      "name": "Moshe Unger",
+      "date": "13/12",
+      "image": "https://secure.gravatar.com/avatar/3d6cdf8a040b5398a4ff02721085b024.jpg?s=192&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0010-192.png"
+    },
+    {
+      "name": "Mariia Kaminskaia",
+      "date": "11/12",
+      "image": "https://avatars.slack-edge.com/2024-08-21/7608643817603_a26a2a813105e8d761fa_192.jpg"
+    },
+    {
+      "name": "Anna Kemel",
+      "date": "",
+      "image": "https://avatars.slack-edge.com/2023-11-19/6215511308261_707e1cc62d59860122a1_192.jpg"
     }
   ]
 }
