@@ -23,14 +23,14 @@
       <div class="progress-bar" aria-label="Release progress">
         <div class="progress-fill" [style.width.%]="versionData.progress"></div>
       </div>
-    </div>
 
-    <div class="milestones" *ngIf="versionData.milestones.length">
-      <div class="milestone-title">Key Dates</div>
-      <div class="milestone-list pill-grid">
-        <div class="milestone" *ngFor="let milestone of versionData.milestones">
-          <div class="milestone-name">{{ milestone.name }}</div>
-          <div class="milestone-date">{{ milestone.date }}</div>
+      <div class="milestones" *ngIf="versionData.milestones.length">
+        <div class="milestone-title">Key Dates</div>
+        <div class="milestone-list pill-grid">
+          <div class="milestone" *ngFor="let milestone of versionData.milestones">
+            <div class="milestone-name">{{ milestone.name }}</div>
+            <div class="milestone-date">{{ milestone.date }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -40,6 +40,7 @@
       <div>
         <div class="number">{{ weeksLeft }} WEEKS</div>
         <div class="sub">Until Shipping</div>
+        <div class="muted-detail">{{ versionData.daysLeft }} days remaining</div>
       </div>
     </div>
   </header>
@@ -52,7 +53,7 @@
           <div class="timeline-rail" aria-hidden="true"></div>
           <div *ngFor="let drop of drops" class="timeline-item" [ngClass]="drop.status">
             <div class="dot" [ngClass]="drop.status">
-              <span *ngIf="drop.status === 'completed'">{{ checkIcon }}</span>
+              <span *ngIf="drop.status === 'completed'" [innerHTML]="checkIcon"></span>
             </div>
             <div>
               <h4>{{ drop.name }}</h4>
@@ -92,22 +93,32 @@
 
     <aside class="rightbar">
       <section class="card birthday-card">
-        <div class="avatar halo">
-          <img [src]="birthdays[0].image" [alt]="birthdays[0].name" referrerpolicy="no-referrer" />
-          <div class="cake-icon" [innerHTML]="cakeIcon"></div>
-        </div>
-        <h3>Upcoming Birthday</h3>
-        <p class="name">{{ birthdays[0].name }}</p>
-        <p class="date">{{ birthdays[0].date }}</p>
-        <div class="pill">In {{ birthdays[0].daysAway }} days! 🥳</div>
+        <ng-container *ngIf="hasUpcomingBirthday && upcomingBirthday; else noBirthdaysThisWeek">
+          <div class="avatar halo">
+            <img [src]="upcomingBirthday.image" [alt]="upcomingBirthday.name" referrerpolicy="no-referrer" />
+            <div class="cake-icon" [innerHTML]="cakeIcon"></div>
+          </div>
+          <h3>Upcoming Birthday</h3>
+          <p class="name">{{ upcomingBirthday.name }}</p>
+          <p class="date">{{ upcomingBirthday.date }}</p>
+          <div class="pill">In {{ upcomingBirthday.daysAway }} days! 🥳</div>
+        </ng-container>
 
-        <div class="next-up">
+        <ng-template #noBirthdaysThisWeek>
+          <div class="empty-birthday">
+            <div class="ghost-icon" [innerHTML]="cakeIcon" aria-hidden="true"></div>
+            <h3>No birthdays this week</h3>
+            <p class="muted">We&apos;ll celebrate the next one soon.</p>
+          </div>
+        </ng-template>
+
+        <div class="next-up" *ngIf="nextBirthday">
           <span class="label">Up Next</span>
           <div class="mini">
-            <img [src]="birthdays[1].image" [alt]="birthdays[1].name" width="36" height="36" style="border-radius: 999px; border: 1px solid #27272a;" />
+            <img [src]="nextBirthday.image" [alt]="nextBirthday.name" width="36" height="36" style="border-radius: 999px; border: 1px solid #27272a;" />
             <div>
-              <div>{{ birthdays[1].name }}</div>
-              <div class="mini-date">{{ birthdays[1].date }}</div>
+              <div>{{ nextBirthday.name }}</div>
+              <div class="mini-date">{{ nextBirthday.date }}</div>
             </div>
           </div>
         </div>

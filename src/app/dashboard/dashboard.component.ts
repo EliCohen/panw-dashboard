@@ -18,6 +18,7 @@ import { ConfigService } from '../../services/config.service';
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   private readonly dayInMs = 1000 * 60 * 60 * 24;
+  private readonly upcomingWindowDays = 7;
 
   versionData: VersionData = {
     name: 'Loading…',
@@ -32,10 +33,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   drops: Drop[] = [];
   teams: Team[] = [];
-  birthdays: Birthday[] = [
-    { name: '', date: '', daysAway: 0, image: '' },
-    { name: '', date: '', daysAway: 0, image: '' }
-  ];
+  birthdays: Birthday[] = [];
+  upcomingBirthday?: Birthday;
+  nextBirthday?: Birthday;
+  hasUpcomingBirthday = false;
 
   activeSlide = 0;
   slideIntervalMs = 10000;
@@ -112,9 +113,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         next: (data) => {
           this.versionData = this.calculateVersionData(data.versionData);
           this.weeksLeft = Math.max(Math.ceil(this.versionData.daysLeft / 7), 0);
-          this.drops = Array.isArray(data.drops) ? data.drops : [];
+          this.drops = this.decorateDrops(data.drops);
           this.teams = Array.isArray(data.teams) ? data.teams : [];
-          this.birthdays = this.prepareBirthdays(data.birthdays);
+          const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
+          this.birthdays = decoratedBirthdays;
+          this.upcomingBirthday = decoratedBirthdays.find((birthday) => birthday.daysAway <= this.upcomingWindowDays);
+          this.hasUpcomingBirthday = Boolean(this.upcomingBirthday);
+          this.nextBirthday = decoratedBirthdays.find((birthday) => birthday !== this.upcomingBirthday);
           this.activeSlide = 0;
           this.restartRotation();
           this.cdr.markForCheck();
@@ -153,7 +158,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private prepareBirthdays(birthdays: Birthday[]): Birthday[] {
     if (!Array.isArray(birthdays) || birthdays.length === 0) {
-      return this.birthdays;
+      return [];
     }
 
     const today = this.startOfDay(new Date());
@@ -162,17 +167,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .filter((birthday): birthday is Birthday => birthday !== undefined)
       .sort((a, b) => a.daysAway - b.daysAway);
 
-    const fallback = [...this.birthdays];
-
     if (upcoming.length === 1) {
-      return [upcoming[0], fallback[1]];
+      return upcoming;
     }
 
     if (upcoming.length >= 2) {
       return upcoming.slice(0, 2);
     }
 
-    return fallback;
+    return [];
   }
 
   private decorateBirthday(birthday: Birthday, today: Date): Birthday | undefined {
@@ -240,5 +243,68 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private startOfDay(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private decorateDrops(drops: Drop[]): Drop[] {
+    if (!Array.isArray(drops)) {
+      return [];
+    }
+
+    const today = this.startOfDay(new Date());
+    const parsed = drops
+      .map((drop) => {
+        const parsedDate = this.parseDropDate(drop.date);
+        return { ...drop, parsedDate };
+      })
+      .sort((a, b) => {
+        if (!a.parsedDate || !b.parsedDate) {
+          return 0;
+        }
+        return a.parsedDate.getTime() - b.parsedDate.getTime();
+      });
+
+    const currentIndex = parsed.findIndex((drop) => drop.parsedDate && drop.parsedDate >= today);
+
+    return parsed.map((drop, index) => {
+      if (!drop.parsedDate) {
+        return drop;
+      }
+
+      let status: Drop['status'] = 'upcoming';
+      if (currentIndex === -1) {
+        status = 'completed';
+      } else if (index < currentIndex) {
+        status = 'completed';
+      } else if (index === currentIndex) {
+        status = 'current';
+      }
+
+      return {
+        ...drop,
+        status,
+        date: this.formatDropDate(drop.parsedDate)
+      };
+    });
+  }
+
+  private parseDropDate(dateString: string): Date | undefined {
+    const trimmed = dateString.trim();
+    const dotSeparated = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{2,4})$/);
+    if (!dotSeparated) {
+      const parsed = new Date(trimmed);
+      return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+    }
+
+    const day = Number(dotSeparated[1]);
+    const month = Number(dotSeparated[2]) - 1;
+    const rawYear = Number(dotSeparated[3]);
+    const year = rawYear < 100 ? 2000 + rawYear : rawYear;
+
+    const parsed = new Date(year, month, day);
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+  }
+
+  private formatDropDate(date: Date): string {
+    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short' }).format(date);
   }
 }
