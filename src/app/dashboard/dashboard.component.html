@@ -3,6 +3,7 @@
     <div class="header-title">
       <div class="label">Current Version</div>
       <h1>{{ versionData.name }}</h1>
+      <div class="divider" aria-hidden="true"></div>
       <div class="branches branch-grid" *ngIf="versionData.branches.length">
         <div *ngFor="let branch of versionData.branches" class="branch-row">
           <div class="branch-title">
@@ -12,7 +13,6 @@
           <div class="branch-products">{{ branch.products }}</div>
         </div>
       </div>
-      <div class="divider" aria-hidden="true"></div>
     </div>
 
     <div class="progress">

@@ -7,10 +7,10 @@ export const calendarIcon = `
   </svg>`;
 
 export const clockIcon = `
-  <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6ef2bf" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+    <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#6ef2bf" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10"></circle>
     <polyline points="12 6 12 12 16 14"></polyline>
-  </svg>`;
+    </svg>`;
 
 export const cakeIcon = `
   <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

@@ -30,43 +30,35 @@
   "teams": [
     {
       "name": "Yakov's Team",
-      "iconColor": "#60a5fa",
       "features": [
         "Service deployment hardening"
-      ],
-      "borderColor": "#60a5fa"
+      ]
     },
     {
       "name": "Eli's Team",
-      "iconColor": "#facc15",
       "features": [
         "Dashboard Redesign",
         "Widgets Redesign",
         "XQL Ingestion & Cortex Data Lake"
-      ],
-      "borderColor": "#facc15"
+      ]
     },
     {
       "name": "Matan's Team",
-      "iconColor": "#a855f7",
       "features": [
         "Autopilot Project",
         "Grid Grouping",
         "Generic Pivots Solution",
         "UGrid Filters"
-      ],
-      "borderColor": "#a855f7"
+      ]
     },
     {
       "name": "Ron's Team",
-      "iconColor": "#10b981",
       "features": [
         "MTH/MDR",
         "Cost optimization guardrails",
         "Unity Banners & Toasts",
         "Unity Adoption"
-      ],
-      "borderColor": "#10b981"
+      ]
     }
   ],
   "birthdays": [

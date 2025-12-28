@@ -124,7 +124,7 @@
 }
 
 .milestones {
-  margin-top: 0.75rem;
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -419,11 +419,14 @@
 }
 
 .main .carousel {
-  padding: 1.5rem 1.75rem 2rem;
-  position: relative;
-  overflow: hidden;
-  min-height: 420px;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem 1.75rem 2rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 420px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
 }
 
 .carousel .divider {
@@ -436,6 +439,7 @@
 }
 
 .slide {
+    flex: 1 1 auto; 
   opacity: 0;
   transform: translateY(12px);
   transition: opacity 0.5s ease, transform 0.5s ease;
@@ -518,10 +522,12 @@
 }
 
 .pagination {
+    margin-top: auto; /* pushes dots to the bottom */
+    padding-top: 1rem;
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 1.75rem;
+
 }
 
 .page-dot {

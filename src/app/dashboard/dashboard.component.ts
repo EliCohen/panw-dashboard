@@ -11,7 +11,7 @@ import { ConfigService } from '../../services/config.service';
 @Component({
   selector: 'dashboard',
   standalone: true,
-  imports: [CommonModule, NgClass, LayoutModule, ScrollingModule, AsyncPipe],
+  imports: [CommonModule, NgClass, LayoutModule, ScrollingModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
