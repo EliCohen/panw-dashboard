@@ -1,7 +1,8 @@
 import { AsyncPipe, CommonModule, NgClass } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { BreakpointObserver, Breakpoints, LayoutModule } from '@angular/cdk/layout';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Birthday, Drop, Team, VersionData } from '../../models';
 import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
@@ -42,13 +43,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   weeksLeft = 0;
 
   // Inline SVG strings for quick binding in the template.
-  readonly calendarIcon = calendarIcon;
-  readonly cakeIcon = cakeIcon;
-  readonly checkIcon = checkIcon;
-  readonly chevronIcon = chevronIcon;
-  readonly clockIcon = clockIcon;
-  readonly usersIcon = usersIcon;
-  readonly usersMiniIcon = usersMiniIcon;
+  readonly calendarIcon: SafeHtml;
+  readonly cakeIcon: SafeHtml;
+  readonly checkIcon: SafeHtml;
+  readonly chevronIcon: SafeHtml;
+  readonly clockIcon: SafeHtml;
+  readonly usersIcon: SafeHtml;
+  readonly usersMiniIcon: SafeHtml;
 
   private rotateHandle?: ReturnType<typeof setInterval>;
   private subscriptions = new Subscription();
@@ -57,8 +58,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
-    breakpointObserver: BreakpointObserver
+    breakpointObserver: BreakpointObserver,
+    private readonly sanitizer: DomSanitizer
   ) {
+    this.calendarIcon = this.sanitizeIcon(calendarIcon);
+    this.cakeIcon = this.sanitizeIcon(cakeIcon);
+    this.checkIcon = this.sanitizeIcon(checkIcon);
+    this.chevronIcon = this.sanitizeIcon(chevronIcon);
+    this.clockIcon = this.sanitizeIcon(clockIcon);
+    this.usersIcon = this.sanitizeIcon(usersIcon);
+    this.usersMiniIcon = this.sanitizeIcon(usersMiniIcon);
+
     this.subscriptions.add(
       breakpointObserver.observe([Breakpoints.Handset]).subscribe(({ matches }) => {
         this.slideIntervalMs = matches ? 7000 : 10000;
@@ -128,6 +138,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       })
     );
+  }
+
+  private sanitizeIcon(rawSvg: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(rawSvg);
   }
 
   private calculateVersionData(versionData: VersionData): VersionData {
