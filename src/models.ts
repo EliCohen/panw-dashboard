@@ -37,7 +37,7 @@ export interface Team {
 export interface Birthday {
   name: string;
   date: string;
-  daysAway: number | string;
+  daysAway: number;
   image: string;
 }
 
