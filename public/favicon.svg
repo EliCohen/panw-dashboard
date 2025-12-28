@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dashboard Favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0B1120" />
+    </linearGradient>
+    <radialGradient id="glow" cx="40%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#6CA8FF" stop-opacity="0.95" />
+      <stop offset="60%" stop-color="#6CA8FF" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#6CA8FF" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="stroke" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8B5CF6" />
+      <stop offset="100%" stop-color="#34D399" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="64" fill="url(#bg)" />
+  <circle cx="128" cy="128" r="104" fill="url(#glow)" />
+  <circle cx="128" cy="128" r="96" fill="none" stroke="url(#stroke)" stroke-width="6" />
+  <path d="M128 74c-24 0-44 18-44 44 0 21 15 38 35 42l-9 22c17-5 42-23 51-40 18-33-3-68-33-68Zm-12 26c6-8 19-8 26 0s6 21-3 30l-6 6-6-6c-9-9-9-22-3-30Z" fill="#E0E7FF"/>
+</svg>
