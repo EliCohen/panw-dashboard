@@ -3,9 +3,6 @@
     "name": "FY26 Q3",
     "startDate": "2025-12-21",
     "endDate": "2026-03-15",
-    "totalDays": 84,
-    "daysLeft": 84,
-    "progress": 30,
     "milestones": [
       { "name": "Start", "date": "21.12.25" },
       { "name": "Platform FF", "date": "22.02.26" },
@@ -35,9 +32,7 @@
       "name": "Yakov's Team",
       "iconColor": "#60a5fa",
       "features": [
-        "Service deployment hardening",
-        "CI pipeline stabilization",
-        "Infra monitoring uplift"
+        "Service deployment hardening"
       ],
       "borderColor": "#60a5fa"
     },
@@ -45,9 +40,9 @@
       "name": "Eli's Team",
       "iconColor": "#facc15",
       "features": [
-        "Tenant provisioning UX",
-        "Notification preferences revamp",
-        "Multi-locale support"
+        "Dashboard Redesign",
+        "Widgets Redesign",
+        "XQL Ingestion & Cortex Data Lake"
       ],
       "borderColor": "#facc15"
     },
@@ -55,9 +50,10 @@
       "name": "Matan's Team",
       "iconColor": "#a855f7",
       "features": [
-        "Threat intel ingestion",
-        "Detection content refresh",
-        "SOAR playbook updates"
+        "Autopilot Project",
+        "Grid Grouping",
+        "Generic Pivots Solution",
+        "UGrid Filters"
       ],
       "borderColor": "#a855f7"
     },
@@ -65,9 +61,10 @@
       "name": "Ron's Team",
       "iconColor": "#10b981",
       "features": [
-        "Cloud posture baselines",
+        "MTH/MDR",
         "Cost optimization guardrails",
-        "DR and failover rehearsal"
+        "Unity Banners & Toasts",
+        "Unity Adoption"
       ],
       "borderColor": "#10b981"
     }

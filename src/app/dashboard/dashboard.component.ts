@@ -1,7 +1,7 @@
-import { CommonModule, NgClass } from '@angular/common';
+import { AsyncPipe, CommonModule, NgClass } from '@angular/common';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
-// import { BreakpointObserver, Breakpoints, LayoutModule } from '@angular/cdk/layout';
-// import { ScrollingModule } from '@angular/cdk/scrolling';
+import { BreakpointObserver, Breakpoints, LayoutModule } from '@angular/cdk/layout';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 import { Subscription } from 'rxjs';
 import { Birthday, Drop, Team, VersionData } from '../../models';
 import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
@@ -10,8 +10,7 @@ import { ConfigService } from '../../services/config.service';
 @Component({
   selector: 'dashboard',
   standalone: true,
-  imports: [CommonModule, NgClass],
-//   imports: [CommonModule, NgClass, LayoutModule, ScrollingModule, AsyncPipe],
+  imports: [CommonModule, NgClass, LayoutModule, ScrollingModule, AsyncPipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -58,14 +57,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
-    // breakpointObserver: BreakpointObserver
+    breakpointObserver: BreakpointObserver
   ) {
-    // this.subscriptions.add(
-    //   breakpointObserver.observe([Breakpoints.Handset]).subscribe(({ matches }) => {
-    //     this.slideIntervalMs = matches ? 7000 : 10000;
-    //     this.restartRotation();
-    //   })
-    // );
+    this.subscriptions.add(
+      breakpointObserver.observe([Breakpoints.Handset]).subscribe(({ matches }) => {
+        this.slideIntervalMs = matches ? 7000 : 10000;
+        this.restartRotation();
+      })
+    );
   }
 
   ngOnInit(): void {

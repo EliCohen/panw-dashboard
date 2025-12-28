@@ -3,7 +3,7 @@
   color: #e5e7eb;
 }
 
-.app-shell {
+.dashboard-container {
   position: relative;
   min-height: 100vh;
   padding: clamp(1.25rem, 2vw, 2.75rem);
@@ -12,10 +12,9 @@
   gap: 1.4rem;
   width: 100%;
   max-width: 100%;
-  margin: 0 auto clamp(1.5rem, 3vw, 2.5rem);
 }
 
-.app-shell::before {
+.dashboard-container::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -65,6 +64,7 @@
   font-weight: 900;
   letter-spacing: -0.02em;
   background: linear-gradient(90deg, #6ca8ff, #8e7bff);
+  background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
 }
@@ -745,7 +745,7 @@
 }
 
 @media (min-width: 1600px) {
-  .app-shell {
+  .dashboard-container {
     width: 100%;
     max-width: 100%;
     gap: 1.75rem;
@@ -782,7 +782,7 @@
 }
 
 @media (max-width: 900px) {
-  .app-shell {
+  .dashboard-container {
     padding: 1.25rem;
   }
 
