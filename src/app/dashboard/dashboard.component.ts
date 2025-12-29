@@ -4,7 +4,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Birthday, Drop, Team, VersionData } from '../../models';
+import { Birthday, Drop, Feature, Team, VersionData } from '../../models';
 import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
 import { ConfigService } from '../../services/config.service';
 
@@ -123,7 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.versionData = this.calculateVersionData(data.versionData);
           this.weeksLeft = Math.max(Math.ceil(this.versionData.daysLeft / 7), 0);
           this.drops = this.decorateDrops(data.drops);
-          this.teams = Array.isArray(data.teams) ? data.teams : [];
+          this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
           const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
           this.birthdays = decoratedBirthdays;
           this.upcomingBirthday = decoratedBirthdays.find((birthday) => birthday.daysAway <= this.upcomingWindowDays);
@@ -319,5 +319,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private formatDropDate(date: Date): string {
     return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short' }).format(date);
+  }
+
+  private decorateTeam(team: Partial<Team>): Team {
+    const features = Array.isArray(team.features) ? team.features.map((feature) => this.normalizeFeature(feature)) : [];
+    return {
+      name: team.name ?? 'Unnamed Team',
+      iconColor: team.iconColor ?? '#60a5fa',
+      borderColor: team.borderColor ?? 'rgba(96, 165, 250, 0.5)',
+      features
+    };
+  }
+
+  private normalizeFeature(feature: Feature | string): Feature {
+    if (typeof feature === 'string') {
+      return { title: feature, dev: [], qa: [] };
+    }
+
+    return {
+      title: feature.title,
+      dev: Array.isArray(feature.dev) ? feature.dev : [],
+      qa: Array.isArray(feature.qa) ? feature.qa : []
+    };
   }
 }

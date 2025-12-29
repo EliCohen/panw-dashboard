@@ -31,33 +31,81 @@
     {
       "name": "Yakov's Team",
       "features": [
-        "Service deployment hardening"
+        {
+          "title": "Service deployment hardening",
+          "dev": ["Alex"],
+          "qa": ["Anna"]
+        }
       ]
     },
     {
       "name": "Eli's Team",
       "features": [
-        "Dashboard Redesign",
-        "Widgets Redesign",
-        "XQL Ingestion & Cortex Data Lake"
+        {
+          "title": "Dashboard Redesign",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "Widgets Redesign",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "XQL Ingestion & Cortex Data Lake",
+          "dev": [],
+          "qa": []
+        }
       ]
     },
     {
       "name": "Matan's Team",
       "features": [
-        "Autopilot Project",
-        "Grid Grouping",
-        "Generic Pivots Solution",
-        "UGrid Filters"
+        {
+          "title": "Autopilot Project",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "Grid Grouping",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "Generic Pivots Solution",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "UGrid Filters",
+          "dev": [],
+          "qa": []
+        }
       ]
     },
     {
       "name": "Ron's Team",
       "features": [
-        "MTH/MDR",
-        "Cost optimization guardrails",
-        "Unity Banners & Toasts",
-        "Unity Adoption"
+        {
+          "title": "MTH/MDR",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "Cost optimization guardrails",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "Unity Banners & Toasts",
+          "dev": [],
+          "qa": []
+        },
+        {
+          "title": "Unity Adoption",
+          "dev": [],
+          "qa": []
+        }
       ]
     }
   ],

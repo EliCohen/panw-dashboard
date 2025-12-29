@@ -80,7 +80,20 @@
           <ul class="feature-list">
             <li *ngFor="let feature of team.features" class="feature-item">
               <span [innerHTML]="chevronIcon"></span>
-              <span>{{ feature }}</span>
+              <div class="feature-content">
+                <div class="feature-title">{{ feature.title }}</div>
+                <div class="feature-owners" *ngIf="(feature.dev?.length || feature.qa?.length)">
+                  <ng-container *ngIf="feature.dev?.length">
+                    <span class="owner-label">Dev:</span>
+                    <span class="owner-names">{{ feature.dev?.join(', ') }}</span>
+                  </ng-container>
+                  <ng-container *ngIf="feature.qa?.length">
+                    <span class="owner-separator" *ngIf="feature.dev?.length">•</span>
+                    <span class="owner-label">QA:</span>
+                    <span class="owner-names">{{ feature.qa?.join(', ') }}</span>
+                  </ng-container>
+                </div>
+              </div>
             </li>
           </ul>
         </article>

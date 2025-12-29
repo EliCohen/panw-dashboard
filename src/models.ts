@@ -9,6 +9,12 @@ export interface BranchInfo {
   products: string;
 }
 
+export interface Feature {
+  title: string;
+  dev?: string[];
+  qa?: string[];
+}
+
 export interface VersionData {
   name: string;
   startDate: string | Date;
@@ -30,7 +36,7 @@ export interface Drop {
 export interface Team {
   name: string;
   iconColor: string;
-  features: string[];
+  features: Feature[];
   borderColor: string;
 }
 
