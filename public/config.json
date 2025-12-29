@@ -32,9 +32,19 @@
       "name": "Yakov's Team",
       "features": [
         {
-          "title": "Service deployment hardening",
-          "dev": ["Alex"],
-          "qa": ["Anna"]
+          "title": "Bundle Improvments",
+          "dev": ["Alex F."],
+          "qa": []
+        },
+        {
+          "title": "Managed XSIAM (MXIAM) CC",
+          "dev": ["Alex F."],
+          "qa": ["Mariia"]
+        },
+        {
+          "title": "Cases Timeline",
+          "dev": ["Dor"],
+          "qa": []
         }
       ]
     },
@@ -43,43 +53,28 @@
       "features": [
         {
           "title": "Dashboard Redesign",
-          "dev": [],
+          "dev": ["Tim", "Lion", "Larry"],
+          "qa": ["Moshe"]
+        },
+        {
+          "title": "Unity Widgets",
+          "dev": ["Uriel"],
           "qa": []
         },
         {
-          "title": "Widgets Redesign",
-          "dev": [],
+          "title": "NLS: Wigets Generation",
+          "dev": ["Larry"],
           "qa": []
         },
         {
           "title": "XQL Ingestion & Cortex Data Lake",
-          "dev": [],
-          "qa": []
-        }
-      ]
-    },
-    {
-      "name": "Matan's Team",
-      "features": [
-        {
-          "title": "Autopilot Project",
-          "dev": [],
-          "qa": []
+          "dev": ["Reut"],
+          "qa": ["Mariia"]
         },
         {
-          "title": "Grid Grouping",
-          "dev": [],
-          "qa": []
-        },
-        {
-          "title": "Generic Pivots Solution",
-          "dev": [],
-          "qa": []
-        },
-        {
-          "title": "UGrid Filters",
-          "dev": [],
-          "qa": []
+          "title": "Unity Adoption: XQL Search",
+          "dev": ["Reut"],
+          "qa": ["Moshe"]
         }
       ]
     },
@@ -88,22 +83,52 @@
       "features": [
         {
           "title": "MTH/MDR",
-          "dev": [],
-          "qa": []
+          "dev": ["Shimon"],
+          "qa": ["Anna K.", "Mariia"]
         },
         {
-          "title": "Cost optimization guardrails",
-          "dev": [],
+          "title": "Unity Widgets",
+          "dev": ["Doron"],
           "qa": []
         },
         {
           "title": "Unity Banners & Toasts",
-          "dev": [],
-          "qa": []
+          "dev": ["Asaf"],
+          "qa": ["Anna K."]
         },
         {
           "title": "Unity Adoption",
-          "dev": [],
+          "dev": ["Moran"],
+          "qa": ["Mariia", "Moshe"]
+        }
+      ]
+    },
+    {
+      "name": "Matan's Team",
+      "features": [
+        {
+          "title": "Autopilot Project",
+          "dev": ["Alex S."],
+          "qa": []
+        },
+        {
+          "title": "Grid Grouping",
+          "dev": ["Alex S."],
+          "qa": []
+        },
+        {
+          "title": "Generic Pivots Solution",
+          "dev": ["Alex S."],
+          "qa": []
+        },
+        {
+          "title": "UGrid Filters",
+          "dev": ["Chaim"],
+          "qa": []
+        },
+        {
+          "title": "UGrid Enhancments",
+          "dev": ["Chaim"],
           "qa": []
         }
       ]
