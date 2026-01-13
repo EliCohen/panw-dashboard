@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { Birthday, Drop, Feature, Team, VersionData } from '../../models';
 import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
 import { ConfigService } from '../../services/config.service';
+import { roundTo } from '../../services/utils.service';
 
 @Component({
   selector: 'dashboard',
@@ -40,7 +41,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   activeSlide = 0;
   slideIntervalMs = 10000;
-  weeksLeft = 0;
+  weeksLeft: number = 0;
 
   // Inline SVG strings for quick binding in the template.
   readonly calendarIcon: SafeHtml;
@@ -121,7 +122,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.configService.getConfig().subscribe({
         next: (data) => {
           this.versionData = this.calculateVersionData(data.versionData);
-          this.weeksLeft = Math.max(Math.ceil(this.versionData.daysLeft / 7), 0);
+          this.weeksLeft = Math.max(roundTo(this.versionData.daysLeft / 7,1), 0);
           this.drops = this.decorateDrops(data.drops);
           this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
           const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
