@@ -42,6 +42,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   activeSlide = 0;
   slideIntervalMs = 10000;
   weeksLeft: number = 0;
+  showWorkoutReminder = false;
 
   // Inline SVG strings for quick binding in the template.
   readonly calendarIcon: SafeHtml;
@@ -53,6 +54,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly usersMiniIcon: SafeHtml;
 
   private rotateHandle?: ReturnType<typeof setInterval>;
+  private workoutReminderHandle?: ReturnType<typeof setInterval>;
   private subscriptions = new Subscription();
 
   private readonly configService = inject(ConfigService);
@@ -81,10 +83,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadConfig();
     this.startRotation();
+    this.startWorkoutReminder();
   }
 
   ngOnDestroy(): void {
     this.stopRotation();
+    this.stopWorkoutReminder();
     this.subscriptions.unsubscribe();
   }
 
@@ -115,6 +119,33 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private restartRotation(): void {
     this.stopRotation();
     this.startRotation();
+  }
+
+  private startWorkoutReminder(): void {
+    if (this.workoutReminderHandle) {
+      return;
+    }
+    this.updateWorkoutReminderVisibility();
+    this.workoutReminderHandle = setInterval(() => {
+      this.updateWorkoutReminderVisibility();
+    }, 30000);
+  }
+
+  private stopWorkoutReminder(): void {
+    if (this.workoutReminderHandle) {
+      clearInterval(this.workoutReminderHandle);
+      this.workoutReminderHandle = undefined;
+    }
+  }
+
+  private updateWorkoutReminderVisibility(): void {
+    const now = new Date();
+    const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
+    const day = now.getDay();
+    const isWeekdayWindow = day >= 0 && day <= 4;
+    const isTimeWindow = minutesSinceMidnight >= 705 && minutesSinceMidnight < 720;
+    this.showWorkoutReminder = isWeekdayWindow && isTimeWindow;
+    this.cdr.markForCheck();
   }
 
   private loadConfig(): void {

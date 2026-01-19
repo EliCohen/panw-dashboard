@@ -150,3 +150,40 @@
     </div>
   </footer>
 </div>
+
+<div class="reminder-overlay" *ngIf="showWorkoutReminder">
+  <div class="reminder-modal card" role="dialog" aria-modal="true" aria-labelledby="workoutReminderTitle">
+    <div class="reminder-illustration" aria-hidden="true">
+      <svg class="pushup-illustration" viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="matGradient" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.9" />
+            <stop offset="100%" stop-color="#9333ea" stop-opacity="0.9" />
+          </linearGradient>
+          <linearGradient id="bodyGradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="100%" stop-color="#22c55e" />
+          </linearGradient>
+        </defs>
+        <rect x="20" y="118" width="280" height="32" rx="16" fill="url(#matGradient)" opacity="0.85" />
+        <rect x="34" y="130" width="252" height="6" rx="3" fill="#0f172a" opacity="0.5" />
+        <circle cx="72" cy="84" r="18" fill="#fde68a" />
+        <rect x="88" y="78" width="112" height="16" rx="8" fill="url(#bodyGradient)" />
+        <rect x="184" y="88" width="68" height="14" rx="7" fill="#60a5fa" />
+        <rect x="116" y="96" width="20" height="38" rx="10" fill="#94a3b8" />
+        <rect x="208" y="98" width="20" height="38" rx="10" fill="#94a3b8" />
+        <rect x="98" y="128" width="30" height="12" rx="6" fill="#1f2937" />
+        <rect x="200" y="128" width="30" height="12" rx="6" fill="#1f2937" />
+        <circle cx="262" cy="108" r="6" fill="#38bdf8" />
+        <circle cx="278" cy="114" r="4" fill="#22c55e" />
+        <circle cx="296" cy="120" r="3" fill="#f472b6" />
+      </svg>
+    </div>
+    <div class="reminder-content">
+      <p class="reminder-label">Workout Reminder</p>
+      <h2 id="workoutReminderTitle">Time for Push-Ups</h2>
+      <p class="reminder-text">Take a few minutes for a quick pre-noon set.</p>
+      <div class="reminder-window">Shows Sunday–Thursday from 11:45 to 12:00.</div>
+    </div>
+  </div>
+</div>
