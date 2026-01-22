@@ -1,4 +1,4 @@
-import { AsyncPipe, CommonModule, NgClass } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { BreakpointObserver, Breakpoints, LayoutModule } from '@angular/cdk/layout';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -7,20 +7,30 @@ import { Subscription } from 'rxjs';
 import { Birthday, Drop, Feature, Team, VersionData } from '../../models';
 import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
 import { ConfigService } from '../../services/config.service';
-import { roundTo } from '../../services/utils.service';
+import { DateUtilsService } from '../../services/date-utils.service';
+import { roundTo, DASHBOARD_CONSTANTS } from '../../services/utils.service';
+import { VersionHeaderComponent } from './components/version-header/version-header.component';
+import { RoadmapComponent } from './components/roadmap/roadmap.component';
+import { TeamCarouselComponent } from './components/team-carousel/team-carousel.component';
+import { BirthdayCardComponent } from './components/birthday-card/birthday-card.component';
 
 @Component({
   selector: 'dashboard',
   standalone: true,
-  imports: [CommonModule, NgClass, LayoutModule, ScrollingModule],
+  imports: [
+    CommonModule,
+    LayoutModule,
+    ScrollingModule,
+    VersionHeaderComponent,
+    RoadmapComponent,
+    TeamCarouselComponent,
+    BirthdayCardComponent
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  private readonly dayInMs = 1000 * 60 * 60 * 24;
-  private readonly upcomingWindowDays = 7;
-
   versionData: VersionData = {
     name: 'Loading…',
     startDate: new Date(),
@@ -40,9 +50,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   hasUpcomingBirthday = false;
 
   activeSlide = 0;
-  slideIntervalMs = 10000;
+  slideIntervalMs: number = DASHBOARD_CONSTANTS.SLIDE_INTERVAL_DESKTOP_MS;
   weeksLeft: number = 0;
   showWorkoutReminder = false;
+  isLoading = true;
+  hasError = false;
+  errorMessage = '';
 
   // Inline SVG strings for quick binding in the template.
   readonly calendarIcon: SafeHtml;
@@ -58,6 +71,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   private readonly configService = inject(ConfigService);
+  private readonly dateUtils = inject(DateUtilsService);
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -74,7 +88,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       breakpointObserver.observe([Breakpoints.Handset]).subscribe(({ matches }) => {
-        this.slideIntervalMs = matches ? 7000 : 10000;
+        this.slideIntervalMs = matches 
+          ? DASHBOARD_CONSTANTS.SLIDE_INTERVAL_MOBILE_MS 
+          : DASHBOARD_CONSTANTS.SLIDE_INTERVAL_DESKTOP_MS;
         this.restartRotation();
       })
     );
@@ -95,6 +111,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectSlide(index: number): void {
     this.activeSlide = index;
     this.restartRotation();
+  }
+
+  onSlideSelected(index: number): void {
+    this.selectSlide(index);
   }
 
   private startRotation(): void {
@@ -128,7 +148,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.updateWorkoutReminderVisibility();
     this.workoutReminderHandle = setInterval(() => {
       this.updateWorkoutReminderVisibility();
-    }, 30000);
+    }, DASHBOARD_CONSTANTS.WORKOUT_REMINDER_CHECK_INTERVAL_MS);
   }
 
   private stopWorkoutReminder(): void {
@@ -142,34 +162,56 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const now = new Date();
     const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
     const day = now.getDay();
-    const isWeekdayWindow = day >= 0 && day <= 4;
-    const isTimeWindow = minutesSinceMidnight >= 705 && minutesSinceMidnight < 720;
+    // Sunday = 0, Monday = 1, ..., Friday = 5
+    // WORKOUT_WEEKDAYS is [0, 1, 2, 3, 4] which means Sunday through Thursday
+    const isWeekdayWindow = DASHBOARD_CONSTANTS.WORKOUT_WEEKDAYS.includes(day as 0 | 1 | 2 | 3 | 4);
+    const isTimeWindow = minutesSinceMidnight >= DASHBOARD_CONSTANTS.WORKOUT_START_MINUTES 
+      && minutesSinceMidnight < DASHBOARD_CONSTANTS.WORKOUT_END_MINUTES;
     this.showWorkoutReminder = isWeekdayWindow && isTimeWindow;
     this.cdr.markForCheck();
   }
 
-  private loadConfig(): void {
+  loadConfig(): void {
+    this.isLoading = true;
+    this.hasError = false;
+    this.errorMessage = '';
+    
     this.subscriptions.add(
       this.configService.getConfig().subscribe({
         next: (data) => {
-          this.versionData = this.calculateVersionData(data.versionData);
-          this.weeksLeft = Math.max(roundTo(this.versionData.daysLeft / 7,1), 0);
-          this.drops = this.decorateDrops(data.drops);
-          this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
-          const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
-          this.birthdays = decoratedBirthdays;
-          this.upcomingBirthday = decoratedBirthdays.find((birthday) => birthday.daysAway <= this.upcomingWindowDays);
-          this.hasUpcomingBirthday = Boolean(this.upcomingBirthday);
-          this.nextBirthday = decoratedBirthdays.find((birthday) => birthday !== this.upcomingBirthday);
-          this.activeSlide = 0;
-          this.restartRotation();
-          this.cdr.markForCheck();
+          try {
+            this.versionData = this.calculateVersionData(data.versionData);
+            this.weeksLeft = Math.max(roundTo(this.versionData.daysLeft / 7, 1), 0);
+            this.drops = this.decorateDrops(data.drops);
+            this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
+            const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
+            this.birthdays = decoratedBirthdays;
+            this.upcomingBirthday = decoratedBirthdays.find(
+              (birthday) => birthday.daysAway <= DASHBOARD_CONSTANTS.UPCOMING_BIRTHDAY_WINDOW_DAYS
+            );
+            this.hasUpcomingBirthday = Boolean(this.upcomingBirthday);
+            this.nextBirthday = decoratedBirthdays.find((birthday) => birthday !== this.upcomingBirthday);
+            this.activeSlide = 0;
+            this.restartRotation();
+            this.isLoading = false;
+            this.cdr.markForCheck();
+          } catch (error) {
+            this.handleError('Failed to process configuration data', error);
+          }
         },
         error: (error) => {
-          console.error('Failed to load configuration', error);
+          this.handleError('Failed to load configuration', error);
         }
       })
     );
+  }
+
+  private handleError(message: string, error: unknown): void {
+    console.error(message, error);
+    this.isLoading = false;
+    this.hasError = true;
+    this.errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+    this.cdr.markForCheck();
   }
 
   private sanitizeIcon(rawSvg: string): SafeHtml {
@@ -186,8 +228,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const remainingMs = Math.max(endDate.getTime() - now.getTime(), 0);
 
     const progress = totalDurationMs === 0 ? 0 : Math.round((elapsedMs / totalDurationMs) * 100);
-    const totalDays = totalDurationMs === 0 ? 0 : Math.ceil(totalDurationMs / this.dayInMs);
-    const daysLeft = remainingMs === 0 ? 0 : Math.ceil(remainingMs / this.dayInMs);
+    const totalDays = totalDurationMs === 0 ? 0 : Math.ceil(totalDurationMs / DASHBOARD_CONSTANTS.DAY_IN_MS);
+    const daysLeft = remainingMs === 0 ? 0 : Math.ceil(remainingMs / DASHBOARD_CONSTANTS.DAY_IN_MS);
 
     return {
       ...versionData,
@@ -206,7 +248,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return [];
     }
 
-    const today = this.startOfDay(new Date());
+    const today = this.dateUtils.startOfDay(new Date());
     const upcoming = birthdays
       .map((birthday) => this.decorateBirthday(birthday, today))
       .filter((birthday): birthday is Birthday => birthday !== undefined)
@@ -224,70 +266,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private decorateBirthday(birthday: Birthday, today: Date): Birthday | undefined {
-    const nextBirthdayDate = this.getNextBirthdayDate(birthday.date, today);
+    const nextBirthdayDate = this.dateUtils.getNextBirthdayDate(birthday.date, today);
     if (!nextBirthdayDate) {
       return undefined;
     }
 
-    const daysAway = Math.max(this.calculateDaysBetween(today, nextBirthdayDate), 0);
-    const displayDate = this.formatBirthdayDate(nextBirthdayDate);
+    const daysAway = Math.max(this.dateUtils.calculateDaysBetween(today, nextBirthdayDate), 0);
+    const displayDate = this.dateUtils.formatBirthdayDate(nextBirthdayDate);
 
     return { ...birthday, daysAway, date: displayDate };
-  }
-
-  private getNextBirthdayDate(dateInput: string, today: Date): Date | undefined {
-    const parts = this.parseDateParts(dateInput);
-    if (!parts) {
-      return undefined;
-    }
-
-    const thisYearBirthday = new Date(today.getFullYear(), parts.month, parts.day);
-    if (Number.isNaN(thisYearBirthday.getTime())) {
-      return undefined;
-    }
-
-    if (thisYearBirthday >= today) {
-      return thisYearBirthday;
-    }
-
-    const nextYearBirthday = new Date(thisYearBirthday);
-    nextYearBirthday.setFullYear(thisYearBirthday.getFullYear() + 1);
-    return nextYearBirthday;
-  }
-
-  private parseDateParts(dateInput: string): { month: number; day: number } | undefined {
-    const trimmed = dateInput.trim();
-    const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (isoMatch) {
-      return { month: Number(isoMatch[2]) - 1, day: Number(isoMatch[3]) };
-    }
-
-    const monthDayMatch = trimmed.match(/^(\d{2})[-/](\d{2})$/);
-    if (monthDayMatch) {
-      return { month: Number(monthDayMatch[2]) - 1, day: Number(monthDayMatch[1]) };
-    }
-
-    const cleaned = trimmed.replace(/(\d+)(st|nd|rd|th)/gi, '$1');
-    const parsed = new Date(cleaned);
-    if (!Number.isNaN(parsed.getTime())) {
-      return { month: parsed.getMonth(), day: parsed.getDate() };
-    }
-
-    return undefined;
-  }
-
-  private calculateDaysBetween(start: Date, end: Date): number {
-    const startTime = this.startOfDay(start).getTime();
-    const endTime = this.startOfDay(end).getTime();
-    return Math.ceil((endTime - startTime) / this.dayInMs);
-  }
-
-  private formatBirthdayDate(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', { month: 'long', day: 'numeric' }).format(date).toUpperCase();
-  }
-
-  private startOfDay(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   private decorateDrops(drops: Drop[]): Drop[] {
@@ -295,10 +282,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return [];
     }
 
-    const today = this.startOfDay(new Date());
+    const today = this.dateUtils.startOfDay(new Date());
     const parsed = drops
       .map((drop) => {
-        const parsedDate = this.parseDropDate(drop.date);
+        const parsedDate = this.dateUtils.parseDropDate(drop.date);
         return { ...drop, parsedDate };
       })
       .sort((a, b) => {
@@ -327,38 +314,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return {
         ...drop,
         status,
-        date: this.formatDropDate(drop.parsedDate)
+        date: this.dateUtils.formatDropDate(drop.parsedDate)
       };
     });
-  }
-
-  private parseDropDate(dateString: string): Date | undefined {
-    const trimmed = dateString.trim();
-    const dotSeparated = trimmed.match(/^(\d{2})\.(\d{2})\.(\d{2,4})$/);
-    if (!dotSeparated) {
-      const parsed = new Date(trimmed);
-      return Number.isNaN(parsed.getTime()) ? undefined : parsed;
-    }
-
-    const day = Number(dotSeparated[1]);
-    const month = Number(dotSeparated[2]) - 1;
-    const rawYear = Number(dotSeparated[3]);
-    const year = rawYear < 100 ? 2000 + rawYear : rawYear;
-
-    const parsed = new Date(year, month, day);
-    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
-  }
-
-  private formatDropDate(date: Date): string {
-    return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: 'short' }).format(date);
   }
 
   private decorateTeam(team: Partial<Team>): Team {
     const features = Array.isArray(team.features) ? team.features.map((feature) => this.normalizeFeature(feature)) : [];
     return {
-      name: team.name ?? 'Unnamed Team',
-      iconColor: team.iconColor ?? '#60a5fa',
-      borderColor: team.borderColor ?? 'rgba(96, 165, 250, 0.5)',
+      name: team.name ?? DASHBOARD_CONSTANTS.DEFAULT_TEAM_NAME,
+      iconColor: team.iconColor ?? DASHBOARD_CONSTANTS.DEFAULT_TEAM_ICON_COLOR,
+      borderColor: team.borderColor ?? DASHBOARD_CONSTANTS.DEFAULT_TEAM_BORDER_COLOR,
       features
     };
   }

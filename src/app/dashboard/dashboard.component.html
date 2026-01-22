@@ -1,166 +1,54 @@
 <div class="dashboard-container">
-  <header class="card header hero">
-    <div class="header-title">
-      <div class="label">Current Version</div>
-      <h1>{{ versionData.name }}</h1>
-      <div class="divider" aria-hidden="true"></div>
-      <div class="branches branch-grid" *ngIf="versionData.branches.length">
-        <div *ngFor="let branch of versionData.branches" class="branch-row">
-          <div class="branch-title">
-            {{ branch.title }}
-            <span class="branch-name">(Branch: {{ branch.branch }})</span>
-          </div>
-          <div class="branch-products">{{ branch.products }}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="progress">
-      <div class="progress-info">
-        <span>Release Progress</span>
-        <span class="accent">{{ versionData.progress }}%</span>
-      </div>
-      <div class="progress-bar" aria-label="Release progress">
-        <div class="progress-fill" [style.width.%]="versionData.progress"></div>
-      </div>
-
-      <div class="milestones" *ngIf="versionData.milestones.length">
-        <div class="milestone-title">Key Dates</div>
-        <div class="milestone-list pill-grid">
-          <div class="milestone" *ngFor="let milestone of versionData.milestones">
-            <div class="milestone-name">{{ milestone.name }}</div>
-            <div class="milestone-date">{{ milestone.date }}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="countdown">
-      <span class="icon-circle countdown-icon" aria-hidden="true" [innerHTML]="clockIcon"></span>
-      <div class="countdown-copy">
-        <div class="number">{{ weeksLeft }} WEEKS</div>
-        <div class="sub">Until Shipping</div>
-        <div class="muted-detail">{{ versionData.daysLeft }} days remaining</div>
-      </div>
-    </div>
-  </header>
-
-  <div class="grid">
-    <aside class="sidebar">
-      <section class="card roadmap">
-        <h2 class="section-title"><span [innerHTML]="calendarIcon"></span> Version Roadmap</h2>
-        <div class="timeline">
-          <div class="timeline-rail" aria-hidden="true"></div>
-          <div *ngFor="let drop of drops" class="timeline-item" [ngClass]="drop.status">
-            <div class="dot" [ngClass]="drop.status">
-              <span *ngIf="drop.status === 'completed'" [innerHTML]="checkIcon"></span>
-            </div>
-            <div>
-              <h4>{{ drop.name }}</h4>
-              <p>{{ drop.date }}</p>
-              <span *ngIf="drop.status === 'current'" class="badge">Ongoing</span>
-            </div>
-          </div>
-        </div>
-      </section>
-    </aside>
-
-    <main class="main">
-      <section class="card carousel">
-        <div class="divider" aria-hidden="true"></div>
-        <article
-          *ngFor="let team of teams; let i = index"
-          class="slide"
-          [ngClass]="{ active: i === activeSlide }"
-        >
-          <div class="slide-header">
-            <div
-              class="icon-circle"
-              [style.borderColor]="team.borderColor"
-              [innerHTML]="usersIcon"
-            ></div>
-            <div class="team-meta">
-              <div class="team-pill"><span [innerHTML]="usersMiniIcon"></span> {{ team.name }}</div>
-              <h2>Current Initiatives</h2>
-            </div>
-          </div>
-
-          <ul class="feature-list">
-            <li *ngFor="let feature of team.features" class="feature-item">
-              <span [innerHTML]="chevronIcon"></span>
-              <div class="feature-content">
-                <div class="feature-title">{{ feature.title }}</div>
-                <div class="feature-owners" *ngIf="feature.dev?.length || feature.qa?.length">
-                  <ng-container *ngIf="feature.dev?.length">
-                    <span class="owner-label">Dev:</span>
-                    <span class="owner-names">{{ feature.dev?.join(', ') }}</span>
-                  </ng-container>
-                  <ng-container *ngIf="feature.qa?.length">
-                    <span class="owner-separator" *ngIf="feature.dev?.length">•</span>
-                    <span class="owner-label">QA:</span>
-                    <span class="owner-names">{{ feature.qa?.join(', ') }}</span>
-                  </ng-container>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </article>
-
-        <div class="pagination">
-          <div
-            *ngFor="let dot of teams; let i = index"
-            class="page-dot"
-            [ngClass]="{ active: i === activeSlide }"
-            (click)="selectSlide(i)"
-          ></div>
-        </div>
-      </section>
-    </main>
-
-    <aside class="rightbar">
-      <section class="card birthday-card">
-        <ng-container *ngIf="hasUpcomingBirthday && upcomingBirthday; else noBirthdaysThisWeek">
-          <div class="avatar halo">
-            <img
-              [src]="upcomingBirthday.image"
-              [alt]="upcomingBirthday.name"
-              referrerpolicy="no-referrer"
-            />
-            <div class="cake-icon" [innerHTML]="cakeIcon"></div>
-          </div>
-          <h3>Upcoming Birthday</h3>
-          <p class="name">{{ upcomingBirthday.name }}</p>
-          <p class="date">{{ upcomingBirthday.date }}</p>
-          <div class="pill">In {{ upcomingBirthday.daysAway }} days! 🥳</div>
-        </ng-container>
-
-        <ng-template #noBirthdaysThisWeek>
-          <div class="empty-birthday">
-            <div class="ghost-icon" [innerHTML]="cakeIcon" aria-hidden="true"></div>
-            <h3>No birthdays this week</h3>
-            <p class="muted">We&apos;ll celebrate the next one soon.</p>
-          </div>
-        </ng-template>
-
-        <div class="next-up" *ngIf="nextBirthday">
-          <span class="label">Up Next</span>
-          <div class="mini">
-            <img
-              [src]="nextBirthday.image"
-              [alt]="nextBirthday.name"
-              width="36"
-              height="36"
-              style="border-radius: 999px; border: 1px solid #27272a"
-            />
-            <div>
-              <div>{{ nextBirthday.name }}</div>
-              <div class="mini-date">{{ nextBirthday.date }}</div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </aside>
+  <!-- Error State -->
+  <div *ngIf="hasError" class="card error-card">
+    <h2>⚠️ Configuration Error</h2>
+    <p>{{ errorMessage }}</p>
+    <button (click)="loadConfig()" class="retry-button">Retry</button>
   </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && !hasError" class="card loading-card">
+    <div class="loading-spinner"></div>
+    <p>Loading dashboard...</p>
+  </div>
+
+  <!-- Main Content -->
+  <ng-container *ngIf="!isLoading && !hasError">
+    <app-version-header
+      [versionData]="versionData"
+      [weeksLeft]="weeksLeft"
+      [clockIcon]="clockIcon"
+    ></app-version-header>
+
+    <div class="grid">
+      <aside class="sidebar">
+        <app-roadmap
+          [drops]="drops"
+          [calendarIcon]="calendarIcon"
+          [checkIcon]="checkIcon"
+        ></app-roadmap>
+      </aside>
+
+      <main class="main">
+        <app-team-carousel
+          [teams]="teams"
+          [activeSlide]="activeSlide"
+          [usersIcon]="usersIcon"
+          [usersMiniIcon]="usersMiniIcon"
+          [chevronIcon]="chevronIcon"
+          (slideSelected)="onSlideSelected($event)"
+        ></app-team-carousel>
+      </main>
+
+      <aside class="rightbar">
+        <app-birthday-card
+          [upcomingBirthday]="upcomingBirthday"
+          [nextBirthday]="nextBirthday"
+          [hasUpcomingBirthday]="hasUpcomingBirthday"
+          [cakeIcon]="cakeIcon"
+        ></app-birthday-card>
+      </aside>
+    </div>
 
   <footer class="footer">
     <div class="ticker">
@@ -175,9 +63,10 @@
       <span>SYSTEMS OPERATIONAL</span>
     </div>
   </footer>
+  </ng-container>
 </div>
 
-<div class="reminder-overlay" *ngIf="showWorkoutReminder">
+<div class="reminder-overlay" *ngIf="showWorkoutReminder && !isLoading">
   <div
     class="reminder-modal card"
     role="dialog"
