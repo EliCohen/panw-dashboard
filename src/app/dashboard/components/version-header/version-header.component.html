@@ -1,0 +1,45 @@
+<header class="card header hero">
+  <div class="header-title">
+    <div class="label">Current Version</div>
+    <h1>{{ versionData.name }}</h1>
+    <div class="divider" aria-hidden="true"></div>
+    <div class="branches branch-grid" *ngIf="versionData.branches.length">
+      <div *ngFor="let branch of versionData.branches" class="branch-row">
+        <div class="branch-title">
+          {{ branch.title }}
+          <span class="branch-name">(Branch: {{ branch.branch }})</span>
+        </div>
+        <div class="branch-products">{{ branch.products }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress">
+    <div class="progress-info">
+      <span>Release Progress</span>
+      <span class="accent">{{ versionData.progress }}%</span>
+    </div>
+    <div class="progress-bar" aria-label="Release progress">
+      <div class="progress-fill" [style.width.%]="versionData.progress"></div>
+    </div>
+
+    <div class="milestones" *ngIf="versionData.milestones.length">
+      <div class="milestone-title">Key Dates</div>
+      <div class="milestone-list pill-grid">
+        <div class="milestone" *ngFor="let milestone of versionData.milestones">
+          <div class="milestone-name">{{ milestone.name }}</div>
+          <div class="milestone-date">{{ milestone.date }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="countdown">
+    <span class="icon-circle countdown-icon" aria-hidden="true" [innerHTML]="clockIcon"></span>
+    <div class="countdown-copy">
+      <div class="number">{{ weeksLeft }} WEEKS</div>
+      <div class="sub">Until Shipping</div>
+      <div class="muted-detail">{{ versionData.daysLeft }} days remaining</div>
+    </div>
+  </div>
+</header>

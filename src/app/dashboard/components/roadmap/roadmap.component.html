@@ -1,0 +1,16 @@
+<section class="card roadmap">
+  <h2 class="section-title"><span [innerHTML]="calendarIcon"></span> Version Roadmap</h2>
+  <div class="timeline">
+    <div class="timeline-rail" aria-hidden="true"></div>
+    <div *ngFor="let drop of drops" class="timeline-item" [ngClass]="drop.status">
+      <div class="dot" [ngClass]="drop.status">
+        <span *ngIf="drop.status === 'completed'" [innerHTML]="checkIcon"></span>
+      </div>
+      <div>
+        <h4>{{ drop.name }}</h4>
+        <p>{{ drop.date }}</p>
+        <span *ngIf="drop.status === 'current'" class="badge">Ongoing</span>
+      </div>
+    </div>
+  </div>
+</section>

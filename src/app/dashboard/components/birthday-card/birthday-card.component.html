@@ -1,0 +1,41 @@
+<section class="card birthday-card">
+  <ng-container *ngIf="hasUpcomingBirthday && upcomingBirthday; else noBirthdaysThisWeek">
+    <div class="avatar halo">
+      <img
+        [src]="upcomingBirthday.image"
+        [alt]="upcomingBirthday.name"
+        referrerpolicy="no-referrer"
+      />
+      <div class="cake-icon" [innerHTML]="cakeIcon"></div>
+    </div>
+    <h3>Upcoming Birthday</h3>
+    <p class="name">{{ upcomingBirthday.name }}</p>
+    <p class="date">{{ upcomingBirthday.date }}</p>
+    <div class="pill">In {{ upcomingBirthday.daysAway }} days! 🥳</div>
+  </ng-container>
+
+  <ng-template #noBirthdaysThisWeek>
+    <div class="empty-birthday">
+      <div class="ghost-icon" [innerHTML]="cakeIcon" aria-hidden="true"></div>
+      <h3>No birthdays this week</h3>
+      <p class="muted">We&apos;ll celebrate the next one soon.</p>
+    </div>
+  </ng-template>
+
+  <div class="next-up" *ngIf="nextBirthday">
+    <span class="label">Up Next</span>
+    <div class="mini">
+      <img
+        [src]="nextBirthday.image"
+        [alt]="nextBirthday.name"
+        width="36"
+        height="36"
+        style="border-radius: 999px; border: 1px solid #27272a"
+      />
+      <div>
+        <div>{{ nextBirthday.name }}</div>
+        <div class="mini-date">{{ nextBirthday.date }}</div>
+      </div>
+    </div>
+  </div>
+</section>

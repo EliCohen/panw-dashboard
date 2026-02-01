@@ -1,0 +1,49 @@
+<section class="card carousel">
+  <div class="divider" aria-hidden="true"></div>
+  <article
+    *ngFor="let team of teams; let i = index"
+    class="slide"
+    [ngClass]="{ active: i === activeSlide }"
+  >
+    <div class="slide-header">
+      <div
+        class="icon-circle"
+        [style.borderColor]="team.borderColor"
+        [innerHTML]="usersIcon"
+      ></div>
+      <div class="team-meta">
+        <div class="team-pill"><span [innerHTML]="usersMiniIcon"></span> {{ team.name }}</div>
+        <h2>Current Initiatives</h2>
+      </div>
+    </div>
+
+    <ul class="feature-list">
+      <li *ngFor="let feature of team.features" class="feature-item">
+        <span [innerHTML]="chevronIcon"></span>
+        <div class="feature-content">
+          <div class="feature-title">{{ feature.title }}</div>
+          <div class="feature-owners" *ngIf="feature.dev?.length || feature.qa?.length">
+            <ng-container *ngIf="feature.dev?.length">
+              <span class="owner-label">Dev:</span>
+              <span class="owner-names">{{ feature.dev?.join(', ') }}</span>
+            </ng-container>
+            <ng-container *ngIf="feature.qa?.length">
+              <span class="owner-separator" *ngIf="feature.dev?.length">•</span>
+              <span class="owner-label">QA:</span>
+              <span class="owner-names">{{ feature.qa?.join(', ') }}</span>
+            </ng-container>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </article>
+
+  <div class="pagination">
+    <div
+      *ngFor="let dot of teams; let i = index"
+      class="page-dot"
+      [ngClass]="{ active: i === activeSlide }"
+      (click)="selectSlide(i)"
+    ></div>
+  </div>
+</section>
