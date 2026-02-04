@@ -68,6 +68,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private rotateHandle?: ReturnType<typeof setInterval>;
   private workoutReminderHandle?: ReturnType<typeof setInterval>;
+  private configRefreshTimeout?: ReturnType<typeof setTimeout>;
+  private configRefreshInterval?: ReturnType<typeof setInterval>;
   private subscriptions = new Subscription();
 
   private readonly configService = inject(ConfigService);
@@ -100,11 +102,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadConfig();
     this.startRotation();
     this.startWorkoutReminder();
+    this.startConfigRefresh();
   }
 
   ngOnDestroy(): void {
     this.stopRotation();
     this.stopWorkoutReminder();
+    this.stopConfigRefresh();
     this.subscriptions.unsubscribe();
   }
 
@@ -156,6 +160,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
       clearInterval(this.workoutReminderHandle);
       this.workoutReminderHandle = undefined;
     }
+  }
+
+  private startConfigRefresh(): void {
+    if (this.configRefreshTimeout || this.configRefreshInterval) {
+      return;
+    }
+    const now = new Date();
+    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const msUntilMidnight = Math.max(nextMidnight.getTime() - now.getTime(), 0);
+
+    this.configRefreshTimeout = setTimeout(() => {
+      this.configRefreshTimeout = undefined;
+      this.reloadConfigForMidnight();
+      this.configRefreshInterval = setInterval(() => {
+        this.reloadConfigForMidnight();
+      }, DASHBOARD_CONSTANTS.DAY_IN_MS);
+    }, msUntilMidnight);
+  }
+
+  private stopConfigRefresh(): void {
+    if (this.configRefreshTimeout) {
+      clearTimeout(this.configRefreshTimeout);
+      this.configRefreshTimeout = undefined;
+    }
+    if (this.configRefreshInterval) {
+      clearInterval(this.configRefreshInterval);
+      this.configRefreshInterval = undefined;
+    }
+  }
+
+  private reloadConfigForMidnight(): void {
+    this.configService.clearCache();
+    this.loadConfig();
   }
 
   private updateWorkoutReminderVisibility(): void {

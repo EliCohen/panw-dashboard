@@ -17,4 +17,8 @@ export class ConfigService {
     }
     return this.cache$;
   }
+
+  clearCache(): void {
+    this.cache$ = undefined;
+  }
 }
