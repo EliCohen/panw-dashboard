@@ -1,11 +1,10 @@
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { BreakpointObserver, Breakpoints, LayoutModule } from '@angular/cdk/layout';
-import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Birthday, Drop, Feature, Team, VersionData } from '../../models';
-import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
+import { Birthday, Drop, Feature, Team, VersionData, RawVersionData } from '../../models';
+import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon, pushupIcon } from '../../icons';
 import { ConfigService } from '../../services/config.service';
 import { DateUtilsService } from '../../services/date-utils.service';
 import { roundTo, DASHBOARD_CONSTANTS } from '../../services/utils.service';
@@ -20,7 +19,6 @@ import { BirthdayCardComponent } from './components/birthday-card/birthday-card.
   imports: [
     CommonModule,
     LayoutModule,
-    ScrollingModule,
     VersionHeaderComponent,
     RoadmapComponent,
     TeamCarouselComponent,
@@ -65,11 +63,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly clockIcon: SafeHtml;
   readonly usersIcon: SafeHtml;
   readonly usersMiniIcon: SafeHtml;
+  readonly pushupIcon: SafeHtml;
 
   private rotateHandle?: ReturnType<typeof setInterval>;
   private workoutReminderHandle?: ReturnType<typeof setInterval>;
   private configRefreshTimeout?: ReturnType<typeof setTimeout>;
   private configRefreshInterval?: ReturnType<typeof setInterval>;
+  private configSub?: Subscription;
   private subscriptions = new Subscription();
 
   private readonly configService = inject(ConfigService);
@@ -87,6 +87,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.clockIcon = this.sanitizeIcon(clockIcon);
     this.usersIcon = this.sanitizeIcon(usersIcon);
     this.usersMiniIcon = this.sanitizeIcon(usersMiniIcon);
+    this.pushupIcon = this.sanitizeIcon(pushupIcon);
 
     this.subscriptions.add(
       breakpointObserver.observe([Breakpoints.Handset]).subscribe(({ matches }) => {
@@ -212,35 +213,35 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
-    
-    this.subscriptions.add(
-      this.configService.getConfig().subscribe({
-        next: (data) => {
-          try {
-            this.versionData = this.calculateVersionData(data.versionData);
-            this.weeksLeft = Math.max(roundTo(this.versionData.daysLeft / 7, 1), 0);
-            this.drops = this.decorateDrops(data.drops);
-            this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
-            const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
-            this.birthdays = decoratedBirthdays;
-            this.upcomingBirthday = decoratedBirthdays.find(
-              (birthday) => birthday.daysAway <= DASHBOARD_CONSTANTS.UPCOMING_BIRTHDAY_WINDOW_DAYS
-            );
-            this.hasUpcomingBirthday = Boolean(this.upcomingBirthday);
-            this.nextBirthday = decoratedBirthdays.find((birthday) => birthday !== this.upcomingBirthday);
-            this.activeSlide = 0;
-            this.restartRotation();
-            this.isLoading = false;
-            this.cdr.markForCheck();
-          } catch (error) {
-            this.handleError('Failed to process configuration data', error);
-          }
-        },
-        error: (error) => {
-          this.handleError('Failed to load configuration', error);
+
+    this.configSub?.unsubscribe();
+    this.configSub = this.configService.getConfig().subscribe({
+      next: (data) => {
+        try {
+          this.versionData = this.calculateVersionData(data.versionData);
+          this.weeksLeft = Math.max(roundTo(this.versionData.daysLeft / 7, 1), 0);
+          this.drops = this.decorateDrops(data.drops);
+          this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
+          const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
+          this.birthdays = decoratedBirthdays;
+          this.upcomingBirthday = decoratedBirthdays.find(
+            (birthday) => birthday.daysAway <= DASHBOARD_CONSTANTS.UPCOMING_BIRTHDAY_WINDOW_DAYS
+          );
+          this.hasUpcomingBirthday = Boolean(this.upcomingBirthday);
+          this.nextBirthday = decoratedBirthdays.find((birthday) => birthday !== this.upcomingBirthday);
+          this.activeSlide = 0;
+          this.restartRotation();
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        } catch (error) {
+          this.handleError('Failed to process configuration data', error);
         }
-      })
-    );
+      },
+      error: (error) => {
+        this.handleError('Failed to load configuration', error);
+      }
+    });
+    this.subscriptions.add(this.configSub);
   }
 
   private handleError(message: string, error: unknown): void {
@@ -255,7 +256,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.sanitizer.bypassSecurityTrustHtml(rawSvg);
   }
 
-  private calculateVersionData(versionData: VersionData): VersionData {
+  private calculateVersionData(versionData: RawVersionData): VersionData {
     const startDate = new Date(versionData.startDate);
     const endDate = new Date(versionData.endDate);
     const now = new Date();
@@ -320,7 +321,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     const today = this.dateUtils.startOfDay(new Date());
-    const parsed = drops
+    const parsed: (Drop & { parsedDate?: Date })[] = drops
       .map((drop) => {
         const parsedDate = this.dateUtils.parseDropDate(drop.date);
         return { ...drop, parsedDate };
@@ -334,8 +335,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const currentIndex = parsed.findIndex((drop) => drop.parsedDate && drop.parsedDate >= today);
 
-    return parsed.map((drop, index) => {
-      if (!drop.parsedDate) {
+    return parsed.map(({ parsedDate, ...drop }, index) => {
+      if (!parsedDate) {
         return drop;
       }
 
@@ -351,7 +352,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       return {
         ...drop,
         status,
-        date: this.dateUtils.formatDropDate(drop.parsedDate)
+        date: this.dateUtils.formatDropDate(parsedDate)
       };
     });
   }

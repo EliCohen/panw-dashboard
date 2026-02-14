@@ -1,13 +1,12 @@
 import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
-import { CommonModule, NgClass } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Team } from '../../../../models';
 import { SafeHtml } from '@angular/platform-browser';
-import { chevronIcon, usersIcon, usersMiniIcon } from '../../../../icons';
 
 @Component({
   selector: 'app-team-carousel',
   standalone: true,
-  imports: [CommonModule, NgClass],
+  imports: [CommonModule],
   templateUrl: './team-carousel.component.html',
   styleUrls: ['../../../dashboard/dashboard.component.css'],
   encapsulation: ViewEncapsulation.None

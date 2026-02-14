@@ -2,7 +2,6 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Birthday } from '../../../../models';
 import { SafeHtml } from '@angular/platform-browser';
-import { cakeIcon } from '../../../../icons';
 
 @Component({
   selector: 'app-birthday-card',

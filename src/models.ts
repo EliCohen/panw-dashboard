@@ -15,10 +15,18 @@ export interface Feature {
   qa?: string[];
 }
 
+export interface RawVersionData {
+  name: string;
+  startDate: string;
+  endDate: string;
+  milestones: Milestone[];
+  branches: BranchInfo[];
+}
+
 export interface VersionData {
   name: string;
-  startDate: string | Date;
-  endDate: string | Date;
+  startDate: Date;
+  endDate: Date;
   totalDays: number;
   daysLeft: number;
   progress: number;
@@ -48,7 +56,7 @@ export interface Birthday {
 }
 
 export interface AppConfig {
-  versionData: VersionData;
+  versionData: RawVersionData;
   drops: Drop[];
   teams: Team[];
   birthdays: Birthday[];
