@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, catchError, map, retry, shareReplay, throwError } from 'rxjs';
 import { AppConfig } from '../models';
+import { parseAppConfig } from './config-schema';
 
 @Injectable({ providedIn: 'root' })
 export class ConfigService {
@@ -12,8 +13,19 @@ export class ConfigService {
 
   getConfig(): Observable<AppConfig> {
     if (!this.cache$) {
-      // Because this is a static asset, cache the response for the session.
-      this.cache$ = this.http.get<AppConfig>(this.configUrl, { headers: { 'Cache-Control': 'no-cache' } }).pipe(shareReplay(1));
+      this.cache$ = this.http
+        .get<unknown>(this.configUrl, { headers: { 'Cache-Control': 'no-cache' } })
+        .pipe(
+          retry({ count: 2, delay: 1000 }),
+          map((data) => parseAppConfig(data) as AppConfig),
+          catchError((error) => {
+            console.error('ConfigService: Failed to load or validate config', error);
+            return throwError(() =>
+              error instanceof Error ? error : new Error('Failed to load configuration')
+            );
+          }),
+          shareReplay(1)
+        );
     }
     return this.cache$;
   }

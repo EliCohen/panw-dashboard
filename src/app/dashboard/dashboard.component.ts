@@ -4,11 +4,12 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { Birthday, Drop, Feature, Team, VersionData } from '../../models';
+import { Birthday, Drop, Team, VersionData } from '../../models';
 import { calendarIcon, cakeIcon, checkIcon, chevronIcon, clockIcon, usersIcon, usersMiniIcon } from '../../icons';
 import { ConfigService } from '../../services/config.service';
-import { DateUtilsService } from '../../services/date-utils.service';
-import { roundTo, DASHBOARD_CONSTANTS } from '../../services/utils.service';
+import { DashboardDataService } from '../../services/dashboard-data.service';
+import { TimerService } from '../../services/timer.service';
+import { DASHBOARD_CONSTANTS } from '../../services/utils.service';
 import { VersionHeaderComponent } from './components/version-header/version-header.component';
 import { RoadmapComponent } from './components/roadmap/roadmap.component';
 import { TeamCarouselComponent } from './components/team-carousel/team-carousel.component';
@@ -31,6 +32,11 @@ import { BirthdayCardComponent } from './components/birthday-card/birthday-card.
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private static readonly TIMER_ROTATE = 'carousel-rotation';
+  private static readonly TIMER_WORKOUT = 'workout-reminder';
+  private static readonly TIMER_CONFIG_TIMEOUT = 'config-refresh-timeout';
+  private static readonly TIMER_CONFIG_INTERVAL = 'config-refresh-interval';
+
   versionData: VersionData = {
     name: 'Loading…',
     startDate: new Date(),
@@ -66,32 +72,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly usersIcon: SafeHtml;
   readonly usersMiniIcon: SafeHtml;
 
-  private rotateHandle?: ReturnType<typeof setInterval>;
-  private workoutReminderHandle?: ReturnType<typeof setInterval>;
-  private configRefreshTimeout?: ReturnType<typeof setTimeout>;
-  private configRefreshInterval?: ReturnType<typeof setInterval>;
   private subscriptions = new Subscription();
 
   private readonly configService = inject(ConfigService);
-  private readonly dateUtils = inject(DateUtilsService);
+  private readonly dataService = inject(DashboardDataService);
+  private readonly timerService = inject(TimerService);
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
     breakpointObserver: BreakpointObserver,
     private readonly sanitizer: DomSanitizer
   ) {
-    this.calendarIcon = this.sanitizeIcon(calendarIcon);
-    this.cakeIcon = this.sanitizeIcon(cakeIcon);
-    this.checkIcon = this.sanitizeIcon(checkIcon);
-    this.chevronIcon = this.sanitizeIcon(chevronIcon);
-    this.clockIcon = this.sanitizeIcon(clockIcon);
-    this.usersIcon = this.sanitizeIcon(usersIcon);
-    this.usersMiniIcon = this.sanitizeIcon(usersMiniIcon);
+    this.calendarIcon = this.sanitizer.bypassSecurityTrustHtml(calendarIcon);
+    this.cakeIcon = this.sanitizer.bypassSecurityTrustHtml(cakeIcon);
+    this.checkIcon = this.sanitizer.bypassSecurityTrustHtml(checkIcon);
+    this.chevronIcon = this.sanitizer.bypassSecurityTrustHtml(chevronIcon);
+    this.clockIcon = this.sanitizer.bypassSecurityTrustHtml(clockIcon);
+    this.usersIcon = this.sanitizer.bypassSecurityTrustHtml(usersIcon);
+    this.usersMiniIcon = this.sanitizer.bypassSecurityTrustHtml(usersMiniIcon);
 
     this.subscriptions.add(
       breakpointObserver.observe([Breakpoints.Handset]).subscribe(({ matches }) => {
-        this.slideIntervalMs = matches 
-          ? DASHBOARD_CONSTANTS.SLIDE_INTERVAL_MOBILE_MS 
+        this.slideIntervalMs = matches
+          ? DASHBOARD_CONSTANTS.SLIDE_INTERVAL_MOBILE_MS
           : DASHBOARD_CONSTANTS.SLIDE_INTERVAL_DESKTOP_MS;
         this.restartRotation();
       })
@@ -106,9 +109,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopRotation();
-    this.stopWorkoutReminder();
-    this.stopConfigRefresh();
+    this.timerService.stopAll();
     this.subscriptions.unsubscribe();
   }
 
@@ -122,22 +123,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private startRotation(): void {
-    if (this.rotateHandle) {
-      return;
-    }
-    this.rotateHandle = setInterval(() => {
-      if (this.teams.length > 0) {
-        this.activeSlide = (this.activeSlide + 1) % this.teams.length;
-        this.cdr.markForCheck();
-      }
-    }, this.slideIntervalMs);
+    this.timerService.startInterval(
+      DashboardComponent.TIMER_ROTATE,
+      () => {
+        if (this.teams.length > 0) {
+          this.activeSlide = (this.activeSlide + 1) % this.teams.length;
+          this.cdr.markForCheck();
+        }
+      },
+      this.slideIntervalMs
+    );
   }
 
   private stopRotation(): void {
-    if (this.rotateHandle) {
-      clearInterval(this.rotateHandle);
-      this.rotateHandle = undefined;
-    }
+    this.timerService.stop(DashboardComponent.TIMER_ROTATE);
   }
 
   private restartRotation(): void {
@@ -146,48 +145,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private startWorkoutReminder(): void {
-    if (this.workoutReminderHandle) {
-      return;
-    }
     this.updateWorkoutReminderVisibility();
-    this.workoutReminderHandle = setInterval(() => {
-      this.updateWorkoutReminderVisibility();
-    }, DASHBOARD_CONSTANTS.WORKOUT_REMINDER_CHECK_INTERVAL_MS);
-  }
-
-  private stopWorkoutReminder(): void {
-    if (this.workoutReminderHandle) {
-      clearInterval(this.workoutReminderHandle);
-      this.workoutReminderHandle = undefined;
-    }
+    this.timerService.startInterval(
+      DashboardComponent.TIMER_WORKOUT,
+      () => this.updateWorkoutReminderVisibility(),
+      DASHBOARD_CONSTANTS.WORKOUT_REMINDER_CHECK_INTERVAL_MS
+    );
   }
 
   private startConfigRefresh(): void {
-    if (this.configRefreshTimeout || this.configRefreshInterval) {
-      return;
-    }
-    const now = new Date();
-    const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    const msUntilMidnight = Math.max(nextMidnight.getTime() - now.getTime(), 0);
-
-    this.configRefreshTimeout = setTimeout(() => {
-      this.configRefreshTimeout = undefined;
-      this.reloadConfigForMidnight();
-      this.configRefreshInterval = setInterval(() => {
+    const msUntilMidnight = this.timerService.msUntilMidnight();
+    this.timerService.startTimeout(
+      DashboardComponent.TIMER_CONFIG_TIMEOUT,
+      () => {
         this.reloadConfigForMidnight();
-      }, DASHBOARD_CONSTANTS.DAY_IN_MS);
-    }, msUntilMidnight);
-  }
-
-  private stopConfigRefresh(): void {
-    if (this.configRefreshTimeout) {
-      clearTimeout(this.configRefreshTimeout);
-      this.configRefreshTimeout = undefined;
-    }
-    if (this.configRefreshInterval) {
-      clearInterval(this.configRefreshInterval);
-      this.configRefreshInterval = undefined;
-    }
+        this.timerService.startInterval(
+          DashboardComponent.TIMER_CONFIG_INTERVAL,
+          () => this.reloadConfigForMidnight(),
+          DASHBOARD_CONSTANTS.DAY_IN_MS
+        );
+      },
+      msUntilMidnight
+    );
   }
 
   private reloadConfigForMidnight(): void {
@@ -196,15 +175,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private updateWorkoutReminderVisibility(): void {
-    const now = new Date();
-    const minutesSinceMidnight = now.getHours() * 60 + now.getMinutes();
-    const day = now.getDay();
-    // Sunday = 0, Monday = 1, ..., Friday = 5
-    // WORKOUT_WEEKDAYS is [0, 1, 2, 3, 4] which means Sunday through Thursday
-    const isWeekdayWindow = DASHBOARD_CONSTANTS.WORKOUT_WEEKDAYS.includes(day as 0 | 1 | 2 | 3 | 4);
-    const isTimeWindow = minutesSinceMidnight >= DASHBOARD_CONSTANTS.WORKOUT_START_MINUTES 
-      && minutesSinceMidnight < DASHBOARD_CONSTANTS.WORKOUT_END_MINUTES;
-    this.showWorkoutReminder = isWeekdayWindow && isTimeWindow;
+    this.showWorkoutReminder = this.timerService.isWorkoutReminderTime();
     this.cdr.markForCheck();
   }
 
@@ -212,22 +183,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.hasError = false;
     this.errorMessage = '';
-    
+
     this.subscriptions.add(
       this.configService.getConfig().subscribe({
         next: (data) => {
           try {
-            this.versionData = this.calculateVersionData(data.versionData);
-            this.weeksLeft = Math.max(roundTo(this.versionData.daysLeft / 7, 1), 0);
-            this.drops = this.decorateDrops(data.drops);
-            this.teams = Array.isArray(data.teams) ? data.teams.map((team) => this.decorateTeam(team)) : [];
-            const decoratedBirthdays = this.prepareBirthdays(data.birthdays);
-            this.birthdays = decoratedBirthdays;
-            this.upcomingBirthday = decoratedBirthdays.find(
-              (birthday) => birthday.daysAway <= DASHBOARD_CONSTANTS.UPCOMING_BIRTHDAY_WINDOW_DAYS
-            );
-            this.hasUpcomingBirthday = Boolean(this.upcomingBirthday);
-            this.nextBirthday = decoratedBirthdays.find((birthday) => birthday !== this.upcomingBirthday);
+            const result = this.dataService.processConfig(data);
+            this.versionData = result.versionData;
+            this.weeksLeft = result.weeksLeft;
+            this.drops = result.drops;
+            this.teams = result.teams;
+            this.birthdays = result.birthdays;
+            this.upcomingBirthday = result.upcomingBirthday;
+            this.hasUpcomingBirthday = result.hasUpcomingBirthday;
+            this.nextBirthday = result.nextBirthday;
             this.activeSlide = 0;
             this.restartRotation();
             this.isLoading = false;
@@ -249,132 +218,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.hasError = true;
     this.errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
     this.cdr.markForCheck();
-  }
-
-  private sanitizeIcon(rawSvg: string): SafeHtml {
-    return this.sanitizer.bypassSecurityTrustHtml(rawSvg);
-  }
-
-  private calculateVersionData(versionData: VersionData): VersionData {
-    const startDate = new Date(versionData.startDate);
-    const endDate = new Date(versionData.endDate);
-    const now = new Date();
-
-    const totalDurationMs = Math.max(endDate.getTime() - startDate.getTime(), 0);
-    const elapsedMs = Math.min(Math.max(now.getTime() - startDate.getTime(), 0), totalDurationMs);
-    const remainingMs = Math.max(endDate.getTime() - now.getTime(), 0);
-
-    const progress = totalDurationMs === 0 ? 0 : Math.round((elapsedMs / totalDurationMs) * 100);
-    const totalDays = totalDurationMs === 0 ? 0 : Math.ceil(totalDurationMs / DASHBOARD_CONSTANTS.DAY_IN_MS);
-    const daysLeft = remainingMs === 0 ? 0 : Math.ceil(remainingMs / DASHBOARD_CONSTANTS.DAY_IN_MS);
-
-    return {
-      ...versionData,
-      startDate,
-      endDate,
-      milestones: Array.isArray(versionData.milestones) ? versionData.milestones : [],
-      branches: Array.isArray(versionData.branches) ? versionData.branches : [],
-      totalDays,
-      daysLeft,
-      progress
-    };
-  }
-
-  private prepareBirthdays(birthdays: Birthday[]): Birthday[] {
-    if (!Array.isArray(birthdays) || birthdays.length === 0) {
-      return [];
-    }
-
-    const today = this.dateUtils.startOfDay(new Date());
-    const upcoming = birthdays
-      .map((birthday) => this.decorateBirthday(birthday, today))
-      .filter((birthday): birthday is Birthday => birthday !== undefined)
-      .sort((a, b) => a.daysAway - b.daysAway);
-
-    if (upcoming.length === 1) {
-      return upcoming;
-    }
-
-    if (upcoming.length >= 2) {
-      return upcoming.slice(0, 2);
-    }
-
-    return [];
-  }
-
-  private decorateBirthday(birthday: Birthday, today: Date): Birthday | undefined {
-    const nextBirthdayDate = this.dateUtils.getNextBirthdayDate(birthday.date, today);
-    if (!nextBirthdayDate) {
-      return undefined;
-    }
-
-    const daysAway = Math.max(this.dateUtils.calculateDaysBetween(today, nextBirthdayDate), 0);
-    const displayDate = this.dateUtils.formatBirthdayDate(nextBirthdayDate);
-
-    return { ...birthday, daysAway, date: displayDate };
-  }
-
-  private decorateDrops(drops: Drop[]): Drop[] {
-    if (!Array.isArray(drops)) {
-      return [];
-    }
-
-    const today = this.dateUtils.startOfDay(new Date());
-    const parsed = drops
-      .map((drop) => {
-        const parsedDate = this.dateUtils.parseDropDate(drop.date);
-        return { ...drop, parsedDate };
-      })
-      .sort((a, b) => {
-        if (!a.parsedDate || !b.parsedDate) {
-          return 0;
-        }
-        return a.parsedDate.getTime() - b.parsedDate.getTime();
-      });
-
-    const currentIndex = parsed.findIndex((drop) => drop.parsedDate && drop.parsedDate >= today);
-
-    return parsed.map((drop, index) => {
-      if (!drop.parsedDate) {
-        return drop;
-      }
-
-      let status: Drop['status'] = 'upcoming';
-      if (currentIndex === -1) {
-        status = 'completed';
-      } else if (index < currentIndex) {
-        status = 'completed';
-      } else if (index === currentIndex) {
-        status = 'current';
-      }
-
-      return {
-        ...drop,
-        status,
-        date: this.dateUtils.formatDropDate(drop.parsedDate)
-      };
-    });
-  }
-
-  private decorateTeam(team: Partial<Team>): Team {
-    const features = Array.isArray(team.features) ? team.features.map((feature) => this.normalizeFeature(feature)) : [];
-    return {
-      name: team.name ?? DASHBOARD_CONSTANTS.DEFAULT_TEAM_NAME,
-      iconColor: team.iconColor ?? DASHBOARD_CONSTANTS.DEFAULT_TEAM_ICON_COLOR,
-      borderColor: team.borderColor ?? DASHBOARD_CONSTANTS.DEFAULT_TEAM_BORDER_COLOR,
-      features
-    };
-  }
-
-  private normalizeFeature(feature: Feature | string): Feature {
-    if (typeof feature === 'string') {
-      return { title: feature, dev: [], qa: [] };
-    }
-
-    return {
-      title: feature.title,
-      dev: Array.isArray(feature.dev) ? feature.dev : [],
-      qa: Array.isArray(feature.qa) ? feature.qa : []
-    };
   }
 }
