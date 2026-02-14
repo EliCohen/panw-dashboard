@@ -2,7 +2,6 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VersionData } from '../../../../models';
 import { SafeHtml } from '@angular/platform-browser';
-import { clockIcon } from '../../../../icons';
 
 @Component({
   selector: 'app-version-header',

@@ -21,22 +21,22 @@ export class DateUtilsService {
   }
 
   /**
-   * Parses date input in various formats (ISO, MM/DD, MM-DD, with ordinals)
+   * Parses date input in various formats (ISO, DD/MM, DD-MM, with ordinals)
    * Returns month (0-11) and day (1-31)
    */
   parseDateParts(dateInput: string): { month: number; day: number } | undefined {
     const trimmed = dateInput.trim();
-    
+
     // ISO format: YYYY-MM-DD
     const isoMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (isoMatch) {
       return { month: Number(isoMatch[2]) - 1, day: Number(isoMatch[3]) };
     }
 
-    // MM/DD or MM-DD format
-    const monthDayMatch = trimmed.match(/^(\d{2})[-/](\d{2})$/);
-    if (monthDayMatch) {
-      return { month: Number(monthDayMatch[2]) - 1, day: Number(monthDayMatch[1]) };
+    // DD/MM or DD-MM format (Israeli date convention)
+    const dayMonthMatch = trimmed.match(/^(\d{2})[-/](\d{2})$/);
+    if (dayMonthMatch) {
+      return { month: Number(dayMonthMatch[2]) - 1, day: Number(dayMonthMatch[1]) };
     }
 
     // Try parsing with Date constructor (handles various formats including ordinals)
