@@ -164,9 +164,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private startConfigRefresh(): void {
-    if (this.configRefreshTimeout || this.configRefreshInterval) {
+    if (this.configRefreshTimeout) {
       return;
     }
+    this.scheduleNextMidnightRefresh();
+  }
+
+  private scheduleNextMidnightRefresh(): void {
     const now = new Date();
     const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const msUntilMidnight = Math.max(nextMidnight.getTime() - now.getTime(), 0);
@@ -174,9 +178,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.configRefreshTimeout = setTimeout(() => {
       this.configRefreshTimeout = undefined;
       this.reloadConfigForMidnight();
-      this.configRefreshInterval = setInterval(() => {
-        this.reloadConfigForMidnight();
-      }, DASHBOARD_CONSTANTS.DAY_IN_MS);
+      this.scheduleNextMidnightRefresh();
     }, msUntilMidnight);
   }
 
@@ -184,10 +186,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     if (this.configRefreshTimeout) {
       clearTimeout(this.configRefreshTimeout);
       this.configRefreshTimeout = undefined;
-    }
-    if (this.configRefreshInterval) {
-      clearInterval(this.configRefreshInterval);
-      this.configRefreshInterval = undefined;
     }
   }
 
