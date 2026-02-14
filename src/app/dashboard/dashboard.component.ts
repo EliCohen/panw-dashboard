@@ -68,7 +68,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private rotateHandle?: ReturnType<typeof setInterval>;
   private workoutReminderHandle?: ReturnType<typeof setInterval>;
   private configRefreshTimeout?: ReturnType<typeof setTimeout>;
-  private configRefreshInterval?: ReturnType<typeof setInterval>;
   private configSub?: Subscription;
   private subscriptions = new Subscription();
 
